@@ -14,7 +14,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-LAYER_NORM_EPSILON = 1e-5
+LAYER_NORM_EPSILON = 1e-12
 
 N_MAX_POSITIONS = 2048  # maximum input sequence length
 

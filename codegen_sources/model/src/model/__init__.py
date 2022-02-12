@@ -138,10 +138,10 @@ def set_pretrain_emb(model, dico, word2id, embeddings, gpu):
                 continue
             n_found += 1
             model.embeddings.weight[i] = (
-                embeddings[idx].cuda() if gpu else embeddings[idx]
+                embeddings[idx].cpu() if False else embeddings[idx]
             )
             model.pred_layer.proj.weight[i] = (
-                embeddings[idx].cuda() if gpu else embeddings[idx]
+                embeddings[idx].cpu() if False else embeddings[idx]
             )
     logger.info(
         "Pretrained %i/%i words (%.3f%%)."
@@ -176,7 +176,7 @@ def build_model(params, dico, gpu=True):
         )
         logger.info("")
 
-        return [model.cuda() if gpu else model]
+        return [model.cpu() if gpu else model]
 
     else:
         # build
@@ -241,8 +241,8 @@ def build_model(params, dico, gpu=True):
         logger.info("")
 
         return (
-            [encoder.cuda() if gpu else encoder],
-            [dec.cuda() if gpu else dec for dec in decoders],
+            [encoder.cpu() if gpu else encoder],
+            [dec.cpu() if gpu else dec for dec in decoders],
         )
 
 
@@ -260,7 +260,7 @@ def build_classifier(params):
         logger.info("Reloading classifier from %s ..." % params.reload_classifier)
         reloaded = torch.load(
             params.reload_classifier,
-            map_location=lambda storage, loc: storage.cuda(params.local_rank),
+            map_location=lambda storage, loc: storage.cpu(params.local_rank),
         )
         if "classifier" not in reloaded:
             logger.warning(
@@ -274,10 +274,10 @@ def build_classifier(params):
 
     logger.info("Classifier: {}".format(classifier))
 
-    return [classifier.cuda()]
+    return [classifier.cpu()]
 
 
-def reload_transformer(params, path, dico, model, model_type, gpu=True):
+def reload_transformer(params, path, dico, model, model_type, gpu=False):
     """
     Reload a transformer state dict to current model:
     clean 'module.' from state dict,
@@ -289,8 +289,8 @@ def reload_transformer(params, path, dico, model, model_type, gpu=True):
 
     reloaded = torch.load(
         path,
-        map_location=lambda storage, loc: storage.cuda(params.local_rank)
-        if gpu
+        map_location=lambda storage, loc: storage.cpu(params.local_rank)
+        if False
         else storage.cpu(),
     )
     clean_model_state_dict(reloaded, model_type)

@@ -41,6 +41,12 @@ SUPPORTED_LANGUAGES = ["cpp", "java", "python"]
 logger = create_logger(None, 0)
 
 
+def save_to_file(file_name, contents):
+    fh = open(file_name, 'w')
+    fh.write(contents)
+    fh.close()
+
+
 def get_parser():
     """
     Generate a parameters parser.
@@ -109,8 +115,8 @@ class Translator:
         encoder, decoder = build_model(self.reloaded_params, self.dico)
         self.encoder = encoder[0]
         self.decoder = decoder[0]
-        self.encoder.cuda()
-        self.decoder.cuda()
+        self.encoder.cpu()
+        self.decoder.cpu()
         self.encoder.eval()
         self.decoder.eval()
 
@@ -123,21 +129,21 @@ class Translator:
             )
 
     def translate(
-        self,
-        input_code,
-        lang1,
-        lang2,
-        suffix1="_sa",
-        suffix2="_sa",
-        n=1,
-        beam_size=1,
-        sample_temperature=None,
-        device="cuda:0",
-        tokenized=False,
-        detokenize=True,
-        max_tokens=None,
-        length_penalty=0.5,
-        max_len=None,
+            self,
+            input_code,
+            lang1,
+            lang2,
+            suffix1="_sa",
+            suffix2="_sa",
+            n=1,
+            beam_size=1,
+            sample_temperature=None,
+            device="cpu:0",
+            tokenized=False,
+            detokenize=True,
+            max_tokens=None,
+            length_penalty=0.5,
+            max_len=None,
     ):
 
         # Build language processors
@@ -156,10 +162,10 @@ class Translator:
         lang2 += suffix2
 
         assert (
-            lang1 in self.reloaded_params.lang2id.keys()
+                lang1 in self.reloaded_params.lang2id.keys()
         ), f"{lang1} should be in {self.reloaded_params.lang2id.keys()}"
         assert (
-            lang2 in self.reloaded_params.lang2id.keys()
+                lang2 in self.reloaded_params.lang2id.keys()
         ), f"{lang2} should be in {self.reloaded_params.lang2id.keys()}"
 
         with torch.no_grad():
@@ -257,10 +263,10 @@ if __name__ == "__main__":
         params.BPE_path
     ), f"The path to the BPE tokens is incorrect: {params.BPE_path}"
     assert (
-        params.src_lang in SUPPORTED_LANGUAGES
+            params.src_lang in SUPPORTED_LANGUAGES
     ), f"The source language should be in {SUPPORTED_LANGUAGES}."
     assert (
-        params.tgt_lang in SUPPORTED_LANGUAGES
+            params.tgt_lang in SUPPORTED_LANGUAGES
     ), f"The target language should be in {SUPPORTED_LANGUAGES}."
 
     # Initialize translator
@@ -288,3 +294,13 @@ if __name__ == "__main__":
     for out in output:
         print("=" * 20)
         print(out)
+        # save output function to file
+        if params.tgt_lang == "java":
+            output_suffix = ".java"
+        elif params.tgt_lang == "python":
+            output_suffix = ".py"
+        elif params.tgt_lang == "cpp":
+            output_suffix = ".cpp"
+        else:
+            output_suffix = ".txt"
+        save_to_file(f"Translated_{params.tgt_lang}_function{output_suffix}", out)
