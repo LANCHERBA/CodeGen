@@ -27,14 +27,3 @@ int maxLen(int arr[], int n){
     return max_len;
 }
 
-std::unordered_set<int> uniqueElements(const std::vector<int>& l){
-    return std::unordered_set<int>(l.begin(), l.end());
-}
-
-std::vector<int> squareList(const std::vector<int>& l){
-    std::vector<int> result = {};
-    for(int elmt : l){
-        result.push_back(elmt * elmt);
-    }
-    return result;
-}
