@@ -115,8 +115,8 @@ class Translator:
         encoder, decoder = build_model(self.reloaded_params, self.dico)
         self.encoder = encoder[0]
         self.decoder = decoder[0]
-        self.encoder.cpu()
-        self.decoder.cpu()
+        self.encoder.cuda()
+        self.decoder.cuda()
         self.encoder.eval()
         self.decoder.eval()
 
@@ -138,7 +138,7 @@ class Translator:
             n=1,
             beam_size=1,
             sample_temperature=None,
-            device="cpu:0",
+            device="cuda:0",
             tokenized=False,
             detokenize=True,
             max_tokens=None,
