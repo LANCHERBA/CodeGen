@@ -303,4 +303,4 @@ if __name__ == "__main__":
             output_suffix = ".cpp"
         else:
             output_suffix = ".txt"
-        save_to_file(f"Translated_{params.tgt_lang}_function{output_suffix}", out)
+        # save_to_file(f"Translated_{params.tgt_lang}_function{output_suffix}", out)
